@@ -540,6 +540,50 @@ body {
   margin: 0 0 60px;
 }
 
+.outro-botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+  margin: 0 0 56px;
+}
+
+.outro-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 22px;
+  border: 1px solid rgba(122, 217, 255, 0.35);
+  border-radius: 12px;
+  background: rgba(122, 217, 255, 0.05);
+  color: #D4EAF5;
+  text-decoration: none;
+  font-family: 'Handlee', cursive;
+  transition: background 0.3s, border-color 0.3s, transform 0.2s, box-shadow 0.3s;
+  min-width: 160px;
+}
+
+.outro-btn:hover {
+  background: rgba(122, 217, 255, 0.15);
+  border-color: rgba(122, 217, 255, 0.7);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(122, 217, 255, 0.18);
+}
+
+.outro-btn .btn-label {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 19px;
+  letter-spacing: 0.5px;
+}
+
+.outro-btn .btn-sub {
+  font-size: 12px;
+  color: rgba(212, 234, 245, 0.55);
+  letter-spacing: 1px;
+}
+
 .outro-firma {
   border-top: 1px solid rgba(122, 217, 255, 0.18);
   padding-top: 28px;
