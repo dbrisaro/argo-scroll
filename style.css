@@ -295,22 +295,21 @@ body {
 
 .ballena {
   position: absolute;
-  left: 8%;
+  right: 8%;
   width: 220px;
   opacity: 0;
   transition: opacity 1.2s ease;
   pointer-events: none;
   top: 65%;
-  z-index: 2;
   animation: nadar-ballena 18s ease-in-out infinite;
 }
 
 @keyframes nadar-ballena {
-  0%   { transform: translate(0, 0) rotate(2deg); }
-  25%  { transform: translate(60px, 8px) rotate(-1deg); }
-  50%  { transform: translate(100px, -10px) rotate(1deg); }
-  75%  { transform: translate(50px, 6px) rotate(-2deg); }
-  100% { transform: translate(0, 0) rotate(2deg); }
+  0%   { transform: translate(0, 0) rotate(-2deg); }
+  25%  { transform: translate(-60px, 8px) rotate(1deg); }
+  50%  { transform: translate(-100px, -10px) rotate(-1deg); }
+  75%  { transform: translate(-50px, 6px) rotate(2deg); }
+  100% { transform: translate(0, 0) rotate(-2deg); }
 }
 
 .ballena.visible { opacity: 1; }
@@ -393,12 +392,14 @@ body {
 }
 
 /* texto oscuro cuando la cámara está en la superficie */
-.ocean.superficie-modo .etapa h2 { color: #0d3a52; }
-.ocean.superficie-modo .etapa p  { color: rgba(15, 55, 80, 0.75); }
-.ocean.superficie-modo .etapa-num { color: rgba(15,70,100,0.55); }
+.ocean.superficie-modo .etapa h2 { color: #04253a; }
+.ocean.superficie-modo .etapa p  { color: rgba(4, 37, 58, 0.82); }
+.ocean.superficie-modo .etapa-num { color: rgba(4, 37, 58, 0.7); }
+.ocean.superficie-modo #e6 .etapa-num { color: rgba(4, 37, 58, 0.7); }
 .ocean.superficie-modo .marca,
 .ocean.superficie-modo .profundimetro .numero,
-.ocean.superficie-modo .profundimetro .unidad { color: rgba(15,55,80,0.45); }
+.ocean.superficie-modo .profundimetro .unidad { color: rgba(4, 37, 58, 0.5); }
+.ocean.superficie-modo .dato { color: rgba(4, 37, 58, 0.6) !important; }
 
 .dato {
   margin-top: 14px;

@@ -147,6 +147,12 @@ function update() {
   perfil.style.height = (100 - wlPct) + '%'
   barco.style.top = (wlPct - 12) + '%'
 
+  // marcas de profundidad siguen la línea de agua dinámica
+  document.querySelectorAll('.marca, .linea-prof').forEach(el => {
+    const d = parseFloat(el.dataset.depth)
+    el.style.top = (depthToY(d, waterLineY) * 100) + 'vh'
+  })
+
   // color fondo
   const [r, g, b] = sampleKeyframes(bgColor, p)
   ocean.style.background = `rgb(${r},${g},${b})`
