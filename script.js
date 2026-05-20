@@ -72,7 +72,7 @@ const waterLineKf = [
 function depthToY(depth, waterLineY) {
   // boya en superficie: su cuerpo cilíndrico queda justo en la línea de agua (la antenita afuera)
   const surfaceY = waterLineY - 0.025
-  const bottomY = 0.86  // 2000m queda cerca del fondo del viewport
+  const bottomY = 0.78  // 2000m alineado con el final del perfil, deja espacio para eje de salinidad
   return surfaceY + (depth / 2000) * (bottomY - surfaceY)
 }
 
