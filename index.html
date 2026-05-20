@@ -98,14 +98,14 @@
       <!-- perfil que va dibujando la boya al subir -->
       <svg class="perfil" id="perfil" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
         <!-- eje vertical guía -->
-        <line x1="50" y1="4" x2="50" y2="78" stroke="rgba(140,210,230,0.12)" stroke-width="0.15" stroke-dasharray="0.6 0.8"/>
+        <line x1="50" y1="10" x2="50" y2="78" stroke="rgba(140,210,230,0.12)" stroke-width="0.15" stroke-dasharray="0.6 0.8"/>
         <!-- temperatura: fría abajo (~4°C), termoclina cerca de superficie (~20°C) -->
         <path id="perfil-path"
               d="M 50 78
-                 C 49 70, 51 60, 50 52
-                 C 51 44, 50 36, 52 30
-                 C 54 22, 58 14, 62 9
-                 C 68 5, 72 4, 74 4"
+                 C 49 70, 51 62, 50 54
+                 C 51 46, 50 38, 52 32
+                 C 54 24, 58 18, 62 14
+                 C 68 11, 72 10, 74 10"
               fill="none"
               stroke="#7ad9ff"
               stroke-width="0.55"
@@ -115,10 +115,10 @@
         <!-- salinidad: mínimo intermedio, más salado en profundidad y en superficie -->
         <path id="perfil-sal"
               d="M 62 78
-                 C 61 70, 60 60, 60 52
-                 C 58 44, 56 36, 54 30
-                 C 53 22, 55 14, 57 9
-                 C 60 5, 64 4, 65 4"
+                 C 61 70, 60 62, 60 54
+                 C 58 46, 56 38, 54 32
+                 C 53 24, 55 18, 57 14
+                 C 60 11, 64 10, 65 10"
               fill="none"
               stroke="#ffb670"
               stroke-width="0.55"
@@ -164,8 +164,8 @@
 
         <!-- ticks de profundidad (eje Y) alineados al perfil -->
         <g class="eje-y">
-          <line x1="47" y1="4" x2="48" y2="4" stroke="rgba(180,230,250,0.35)" stroke-width="0.15"/>
-          <line x1="47" y1="41" x2="48" y2="41" stroke="rgba(180,230,250,0.35)" stroke-width="0.15"/>
+          <line x1="47" y1="10" x2="48" y2="10" stroke="rgba(180,230,250,0.35)" stroke-width="0.15"/>
+          <line x1="47" y1="44" x2="48" y2="44" stroke="rgba(180,230,250,0.35)" stroke-width="0.15"/>
           <line x1="47" y1="78" x2="48" y2="78" stroke="rgba(180,230,250,0.35)" stroke-width="0.15"/>
         </g>
       </svg>
