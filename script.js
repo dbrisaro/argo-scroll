@@ -47,15 +47,35 @@ function sampleKeyframes(kf, t) {
 // ── keyframes ────────────────────────────────────────
 // Y como fracción del viewport (0=top, 1=bottom)
 
-const boyaY = [
-  { t: 0.00, v: 0.15 },  // superficie: medio sumergida, antena afuera
-  { t: 0.28, v: 0.15 },
-  { t: 0.40, v: 0.50 },  // ~1000m
-  { t: 0.50, v: 0.54 },
-  { t: 0.64, v: 0.84 },  // 2000m
-  { t: 0.84, v: 0.15 },
-  { t: 1.00, v: 0.15 },
+// profundidad de la boya en metros, según el scroll
+const depthKf = [
+  { t: 0.00, v: 0 },
+  { t: 0.28, v: 0 },
+  { t: 0.40, v: 1000 },
+  { t: 0.50, v: 1100 },
+  { t: 0.64, v: 2000 },
+  { t: 0.84, v: 0 },
+  { t: 1.00, v: 0 },
 ]
+
+// posición vertical de la línea de agua en el viewport (0 = arriba, 0.5 = mitad)
+// arranca al medio (sky + water), se va al tope cuando se sumerge, vuelve al medio al transmitir
+const waterLineKf = [
+  { t: 0.00, v: 0.50 },
+  { t: 0.22, v: 0.50 },
+  { t: 0.38, v: 0.00 },  // cámara se sumerge: agua ocupa todo el alto
+  { t: 0.84, v: 0.00 },  // ascenso completo: aún full agua para ver perfil entero
+  { t: 0.92, v: 0.50 },  // transmitiendo: superficie vuelve al medio
+  { t: 1.00, v: 0.50 },
+]
+
+// profundidad (m) → y de viewport, dado el waterLine actual
+function depthToY(depth, waterLineY) {
+  // boya en superficie: su cuerpo cilíndrico queda justo en la línea de agua (la antenita afuera)
+  const surfaceY = waterLineY - 0.025
+  const bottomY = 0.86  // 2000m queda cerca del fondo del viewport
+  return surfaceY + (depth / 2000) * (bottomY - surfaceY)
+}
 
 // deriva horizontal: durante la fase de drift se mueve de costado
 const boyaX = [
@@ -102,8 +122,8 @@ function currentEtapa(t) {
 
 // Convierte Y (fracción vh) a metros
 function yToDepth(y) {
-  if (y <= 0.50) return Math.max(0, Math.round((y - 0.15) / (0.50 - 0.15) * 1000))
-  return Math.round(1000 + (y - 0.50) / (0.84 - 0.50) * 1000)
+  if (y <= 0.71) return Math.max(0, Math.round((y - 0.47) / (0.71 - 0.47) * 1000))
+  return Math.round(1000 + (y - 0.71) / (0.92 - 0.71) * 1000)
 }
 
 // ── loop ─────────────────────────────────────────────
@@ -112,11 +132,21 @@ function update() {
   const max = document.body.scrollHeight - window.innerHeight
   const p = Math.min(window.scrollY / max, 1)
 
-  // posición boya
-  const y = sampleKeyframes(boyaY, p)
+  // posición boya basada en profundidad real + línea de agua dinámica
+  const depthM = sampleKeyframes(depthKf, p)
+  const waterLineY = sampleKeyframes(waterLineKf, p)
+  const y = depthToY(depthM, waterLineY)
   const x = sampleKeyframes(boyaX, p)
   boya.style.top = (y * 100) + 'vh'
   boya.style.transform = `translateX(calc(-50% + ${x}px))`
+
+  // actualizo línea de agua, cielo y perfil según waterLineY
+  const wlPct = waterLineY * 100
+  cielo.style.height = wlPct + '%'
+  superficie.style.top = wlPct + '%'
+  perfil.style.top = wlPct + '%'
+  perfil.style.height = (100 - wlPct) + '%'
+  barco.style.top = (wlPct - 12) + '%'
 
   // color fondo
   const [r, g, b] = sampleKeyframes(bgColor, p)
@@ -140,20 +170,45 @@ function update() {
   barco.style.opacity = barcoOp
   barco.style.transform = `translateX(calc(-50% + ${Math.min(barcoDrift, 380)}px))`
 
-  // profundidad
-  const depth = Math.max(0, yToDepth(y))
+  // profundidad ya está en metros
+  const depth = Math.max(0, Math.round(depthM))
   depthNum.textContent = depth
 
   // ballena solo en la zona de deriva (con su propio movimiento, no sigue a la boya)
   ballena.classList.toggle('visible', p > 0.40 && p < 0.60)
 
   // otros bichos según profundidad (depth)
+  // posicionar bichos dinámicamente según su profundidad objetivo
+  const bichos = {
+    peces:    30,
+    tortuga:  20,
+    delfines: 25,
+    medusa:   500,
+    krill:    900,
+    calamar:  1400,
+    abisal:   1900,
+    estrella: 1980,
+    ballena:  900,
+  }
+  for (const [id, prof] of Object.entries(bichos)) {
+    const el = document.getElementById(id)
+    if (el) el.style.top = (depthToY(prof, waterLineY) * 100) + 'vh'
+  }
+
   document.getElementById('peces').classList.toggle('visible',
     depth < 80 && (p > 0.18 && p < 0.30 || p > 0.85))
+  document.getElementById('tortuga').classList.toggle('visible',
+    depth < 60 && p > 0.05 && p < 0.28)
+  document.getElementById('delfines').classList.toggle('visible',
+    depth < 100 && p > 0.86)
   document.getElementById('medusa').classList.toggle('visible',
     depth > 300 && depth < 800)
+  document.getElementById('krill').classList.toggle('visible',
+    depth > 600 && depth < 1200)
   document.getElementById('calamar').classList.toggle('visible',
     depth > 1100 && depth < 1700 && p > 0.60)
+  document.getElementById('estrella').classList.toggle('visible',
+    depth > 1850)
   document.getElementById('abisal').classList.toggle('visible',
     depth > 1700)
 

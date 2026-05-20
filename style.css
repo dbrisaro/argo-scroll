@@ -105,13 +105,13 @@ body {
   transition: opacity 0.5s ease;
 }
 
-/* cielo */
+/* cielo — ocupa la mitad superior cuando se ve la superficie */
 .cielo {
   position: absolute;
   left: 0; right: 0; top: 0;
-  height: 18%;
+  height: 50%;
   pointer-events: none;
-  background: linear-gradient(180deg, #ffe9b8 0%, #ffd9a0 20%, #f5cfb0 45%, #d9e6ec 80%, transparent 100%);
+  background: linear-gradient(180deg, #ffe9b8 0%, #ffd9a0 22%, #f5cfb0 48%, #d9e6ec 82%, transparent 100%);
   opacity: 0;
   transition: opacity 0.7s ease;
   z-index: 3;
@@ -121,10 +121,10 @@ body {
 
 .sol {
   position: absolute;
-  top: 18%;
+  top: 28%;
   right: 28%;
-  width: 50px;
-  height: 50px;
+  width: 70px;
+  height: 70px;
   border-radius: 50%;
   background: radial-gradient(circle, #fff5b0 0%, #ffd86a 40%, rgba(255,200,80,0.2) 70%, transparent 100%);
   filter: blur(1px);
@@ -160,7 +160,7 @@ body {
   position: absolute;
   left: 0;
   right: 0;
-  top: 18%;
+  top: 50%;
   height: 18px;
   pointer-events: none;
   background:
@@ -174,8 +174,8 @@ body {
 .barco {
   position: absolute;
   left: 50%;
-  width: 130px;
-  top: 13%;
+  width: 220px;
+  top: 38%;
   z-index: 6;
   pointer-events: none;
   transition: opacity 0.6s ease;
@@ -250,11 +250,11 @@ body {
 /* ── Perfil dibujado al subir ── */
 .perfil {
   position: absolute;
-  top: 0;
+  top: 50%;
   left: 50%;
   transform: translateX(-50%);
-  width: clamp(380px, 65vw, 720px);
-  height: 100%;
+  width: clamp(420px, 78vw, 880px);
+  height: 50%;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.5s ease;
@@ -296,11 +296,11 @@ body {
 .ballena {
   position: absolute;
   right: 10%;
-  width: 200px;
+  width: 220px;
   opacity: 0;
   transition: opacity 1.2s ease;
   pointer-events: none;
-  top: 38%;
+  top: 65%;
   animation: nadar-ballena 18s ease-in-out infinite;
 }
 
@@ -324,10 +324,14 @@ body {
 .bicho.visible { opacity: 1; }
 .bicho svg { width: 100%; display: block; }
 
-#peces   { right: 8%;  width: 130px; top: 24%; animation: nadar-der 14s ease-in-out infinite; }
-#medusa  { right: 12%; width: 70px;  top: 26%; animation: flotar-med 6s ease-in-out infinite; }
-#calamar { left: 12%;  width: 80px;  top: 60%; animation: nadar-izq 12s ease-in-out infinite; }
-#abisal  { right: 14%; width: 140px; top: 78%; animation: rondar 10s ease-in-out infinite; }
+#peces   { right: 8%;  width: 140px; top: 56%; animation: nadar-der 14s ease-in-out infinite; }
+#medusa  { right: 12%; width: 80px;  top: 60%; animation: flotar-med 6s ease-in-out infinite; }
+#calamar { left: 12%;  width: 90px;  top: 72%; animation: nadar-izq 12s ease-in-out infinite; }
+#abisal  { right: 14%; width: 150px; top: 84%; animation: rondar 10s ease-in-out infinite; }
+#tortuga { left: 18%;  width: 110px; top: 55%; animation: nadar-der 22s ease-in-out infinite; }
+#delfines{ left: 8%;   width: 160px; top: 54%; animation: nadar-der 18s ease-in-out infinite; }
+#krill   { right: 18%; width: 100px; top: 70%; animation: flotar-med 9s ease-in-out infinite; }
+#estrella{ left: 24%;  width: 36px;  top: 92%; }
 
 @keyframes nadar-der {
   0%, 100% { transform: translateX(0); }
