@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boya Argo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <section class="intro">
+    <div class="boya-intro">
+      <svg viewBox="0 0 40 80" xmlns="http://www.w3.org/2000/svg">
+        <line x1="20" y1="2" x2="20" y2="14" stroke="#A8C8D8" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="20" cy="2" r="1.5" fill="#A8C8D8"/>
+        <rect x="10" y="14" width="20" height="46" rx="10" fill="#D4EAF5"/>
+        <rect x="10" y="32" width="20" height="6" rx="2" fill="#A0C8E0"/>
+        <ellipse cx="20" cy="60" rx="6" ry="4" fill="#B8D8EA"/>
+        <line x1="20" y1="64" x2="20" y2="72" stroke="#A0C8E0" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="20" cy="73" r="2" fill="#A0C8E0"/>
+      </svg>
+    </div>
+    <div class="agua-linea"></div>
+    <h1>boya argo</h1>
+    <p>un instrumento que vive en el océano<br>y mide lo que nadie puede ver</p>
+    <span class="hint">scrolleá para bucear</span>
+  </section>
+
+  <div class="scroll-driver">
+
+    <div class="ocean">
+
+      <div class="luz" id="luz"></div>
+
+      <!-- cielo (solo visible en superficie) -->
+      <div class="cielo" id="cielo">
+        <div class="sol"></div>
+        <div class="nube nube-1"></div>
+        <div class="nube nube-2"></div>
+      </div>
+
+      <!-- superficie / línea de agua -->
+      <div class="superficie" id="superficie"></div>
+
+      <!-- barquito desde donde cae la boya -->
+      <div class="barco" id="barco">
+        <div class="barco-flota">
+        <svg viewBox="0 0 140 80" xmlns="http://www.w3.org/2000/svg">
+          <!-- mástil y vela -->
+          <line x1="62" y1="10" x2="62" y2="48" stroke="#5a4a3a" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M62,12 L62,44 L88,44 Z" fill="#f4ead8" stroke="#c9b88f" stroke-width="1"/>
+          <path d="M62,14 L62,42 L40,42 Z" fill="#fbf6e7" stroke="#c9b88f" stroke-width="1"/>
+          <!-- bandera -->
+          <path d="M62,8 L72,10 L62,14 Z" fill="#d96a5a"/>
+          <!-- casco -->
+          <path d="M18,48 L122,48 L108,68 L32,68 Z" fill="#8b6a4a" stroke="#5a4a3a" stroke-width="1.2"/>
+          <line x1="22" y1="55" x2="118" y2="55" stroke="#5a4a3a" stroke-width="0.8" opacity="0.6"/>
+          <!-- ojo de buey -->
+          <circle cx="50" cy="58" r="2.2" fill="#f4ead8"/>
+          <circle cx="70" cy="58" r="2.2" fill="#f4ead8"/>
+          <circle cx="90" cy="58" r="2.2" fill="#f4ead8"/>
+        </svg>
+        </div>
+      </div>
+
+      <!-- profundidades -->
+      <div class="profundidades">
+        <span class="marca" style="top:12%">0 m</span>
+        <span class="marca" style="top:48%">1000 m</span>
+        <span class="marca" style="top:84%">2000 m</span>
+        <div class="linea-prof" style="top:48%"></div>
+        <div class="linea-prof" style="top:84%"></div>
+      </div>
+
+      <!-- perfil que va dibujando la boya al subir -->
+      <svg class="perfil" id="perfil" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- eje vertical guía -->
+        <line x1="50" y1="10" x2="50" y2="84" stroke="rgba(140,210,230,0.12)" stroke-width="0.15" stroke-dasharray="0.6 0.8"/>
+        <!-- temperatura: fría abajo (~4°C), termoclina cerca de superficie (~20°C) -->
+        <path id="perfil-path"
+              d="M 50 84
+                 C 49 78, 51 72, 50 66
+                 C 49 60, 52 54, 51 48
+                 C 50 42, 53 38, 52 34
+                 C 51 30, 56 26, 58 22
+                 C 62 18, 68 15, 72 12
+                 C 74 11, 74 10, 74 10"
+              fill="none"
+              stroke="#7ad9ff"
+              stroke-width="0.55"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              filter="url(#perfil-glow)"/>
+        <!-- salinidad: mínimo intermedio típico de aguas antárticas, más salado en profundidad -->
+        <path id="perfil-sal"
+              d="M 62 84
+                 C 61 78, 60 72, 60 66
+                 C 60 60, 58 56, 57 52
+                 C 56 48, 54 44, 53 40
+                 C 53 36, 55 32, 56 28
+                 C 58 24, 60 20, 61 16
+                 C 62 13, 64 11, 65 10"
+              fill="none"
+              stroke="#ffb670"
+              stroke-width="0.55"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              filter="url(#perfil-glow)"/>
+        <defs>
+          <filter id="perfil-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="0.4" result="blur"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+        <!-- eje X: temperatura (arriba) — 5/10/15/20 equidistantes -->
+        <g class="eje-x">
+          <line x1="48" y1="9" x2="76" y2="9" stroke="rgba(122,217,255,0.35)" stroke-width="0.15"/>
+          <line x1="50" y1="8.4" x2="50" y2="9.6" stroke="rgba(122,217,255,0.5)" stroke-width="0.15"/>
+          <line x1="58" y1="8.4" x2="58" y2="9.6" stroke="rgba(122,217,255,0.5)" stroke-width="0.15"/>
+          <line x1="66" y1="8.4" x2="66" y2="9.6" stroke="rgba(122,217,255,0.5)" stroke-width="0.15"/>
+          <line x1="74" y1="8.4" x2="74" y2="9.6" stroke="rgba(122,217,255,0.5)" stroke-width="0.15"/>
+          <text x="50" y="7.5" font-size="1.8" fill="#7ad9ff" fill-opacity="0.7" font-family="Handlee, cursive" text-anchor="middle">5°</text>
+          <text x="58" y="7.5" font-size="1.8" fill="#7ad9ff" fill-opacity="0.7" font-family="Handlee, cursive" text-anchor="middle">10°</text>
+          <text x="66" y="7.5" font-size="1.8" fill="#7ad9ff" fill-opacity="0.7" font-family="Handlee, cursive" text-anchor="middle">15°</text>
+          <text x="74" y="7.5" font-size="1.8" fill="#7ad9ff" fill-opacity="0.7" font-family="Handlee, cursive" text-anchor="middle">20°</text>
+        </g>
+        <text id="perfil-label" x="62" y="5.5" font-size="2" fill="#7ad9ff" fill-opacity="0.85" font-family="Handlee, cursive" text-anchor="middle">temperatura (°C)</text>
+
+        <!-- eje X: salinidad (abajo del perfil) — 34/34.5/35/35.5 equidistantes -->
+        <g class="eje-sal">
+          <line x1="48" y1="91" x2="76" y2="91" stroke="rgba(255,182,112,0.35)" stroke-width="0.15"/>
+          <line x1="50" y1="90.4" x2="50" y2="91.6" stroke="rgba(255,182,112,0.5)" stroke-width="0.15"/>
+          <line x1="58" y1="90.4" x2="58" y2="91.6" stroke="rgba(255,182,112,0.5)" stroke-width="0.15"/>
+          <line x1="66" y1="90.4" x2="66" y2="91.6" stroke="rgba(255,182,112,0.5)" stroke-width="0.15"/>
+          <line x1="74" y1="90.4" x2="74" y2="91.6" stroke="rgba(255,182,112,0.5)" stroke-width="0.15"/>
+          <text x="50" y="94" font-size="1.6" fill="#ffb670" fill-opacity="0.7" font-family="Handlee, cursive" text-anchor="middle">34</text>
+          <text x="58" y="94" font-size="1.6" fill="#ffb670" fill-opacity="0.7" font-family="Handlee, cursive" text-anchor="middle">34.5</text>
+          <text x="66" y="94" font-size="1.6" fill="#ffb670" fill-opacity="0.7" font-family="Handlee, cursive" text-anchor="middle">35</text>
+          <text x="74" y="94" font-size="1.6" fill="#ffb670" fill-opacity="0.7" font-family="Handlee, cursive" text-anchor="middle">35.5</text>
+          <text x="62" y="97" font-size="2" fill="#ffb670" fill-opacity="0.85" font-family="Handlee, cursive" text-anchor="middle">salinidad (PSU)</text>
+        </g>
+
+        <!-- ticks de profundidad (eje Y) alineados al perfil -->
+        <g class="eje-y">
+          <line x1="47" y1="10" x2="48" y2="10" stroke="rgba(180,230,250,0.35)" stroke-width="0.15"/>
+          <line x1="47" y1="47" x2="48" y2="47" stroke="rgba(180,230,250,0.35)" stroke-width="0.15"/>
+          <line x1="47" y1="84" x2="48" y2="84" stroke="rgba(180,230,250,0.35)" stroke-width="0.15"/>
+        </g>
+      </svg>
+
+      <!-- boya SVG -->
+      <div class="boya" id="boya">
+        <svg viewBox="0 0 40 80" xmlns="http://www.w3.org/2000/svg">
+          <line x1="20" y1="2" x2="20" y2="14" stroke="#A8C8D8" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="20" cy="2" r="1.5" fill="#A8C8D8"/>
+          <rect x="10" y="14" width="20" height="46" rx="10" fill="#D4EAF5"/>
+          <rect x="10" y="32" width="20" height="6" rx="2" fill="#A0C8E0"/>
+          <ellipse cx="20" cy="60" rx="6" ry="4" fill="#B8D8EA"/>
+          <line x1="20" y1="64" x2="20" y2="72" stroke="#A0C8E0" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="20" cy="73" r="2" fill="#A0C8E0"/>
+        </svg>
+      </div>
+
+      <!-- cardumen de peces (superficie) -->
+      <div class="bicho peces" id="peces">
+        <svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg">
+          <g fill="rgba(220,240,250,0.55)">
+            <path d="M10,30 q6,-6 14,0 l-4,2 l4,2 q-8,4 -14,0 z"/>
+            <path d="M40,18 q6,-6 14,0 l-4,2 l4,2 q-8,4 -14,0 z"/>
+            <path d="M70,32 q6,-6 14,0 l-4,2 l4,2 q-8,4 -14,0 z"/>
+            <path d="M30,42 q5,-5 12,0 l-3,2 l3,2 q-7,3 -12,0 z"/>
+            <path d="M85,15 q5,-5 12,0 l-3,2 l3,2 q-7,3 -12,0 z"/>
+            <path d="M95,40 q5,-5 12,0 l-3,2 l3,2 q-7,3 -12,0 z"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- medusa (zona de penumbra ~500m) -->
+      <div class="bicho medusa" id="medusa">
+        <svg viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="40" cy="30" rx="26" ry="20" fill="rgba(200,170,220,0.28)"/>
+          <ellipse cx="40" cy="30" rx="26" ry="20" fill="none" stroke="rgba(220,200,240,0.45)" stroke-width="1"/>
+          <path d="M18,40 q2,20 -2,40" stroke="rgba(220,200,240,0.35)" stroke-width="1.2" fill="none"/>
+          <path d="M28,44 q-1,22 3,42" stroke="rgba(220,200,240,0.35)" stroke-width="1.2" fill="none"/>
+          <path d="M40,46 q0,24 0,44" stroke="rgba(220,200,240,0.35)" stroke-width="1.2" fill="none"/>
+          <path d="M52,44 q1,22 -3,42" stroke="rgba(220,200,240,0.35)" stroke-width="1.2" fill="none"/>
+          <path d="M62,40 q-2,20 2,40" stroke="rgba(220,200,240,0.35)" stroke-width="1.2" fill="none"/>
+        </svg>
+      </div>
+
+      <!-- calamar (~1500m) -->
+      <div class="bicho calamar" id="calamar">
+        <svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50,8 q18,8 16,40 q-2,12 -16,14 q-14,-2 -16,-14 q-2,-32 16,-40 z" fill="rgba(180,90,110,0.45)"/>
+          <circle cx="44" cy="48" r="2.5" fill="rgba(255,255,255,0.7)"/>
+          <circle cx="56" cy="48" r="2.5" fill="rgba(255,255,255,0.7)"/>
+          <path d="M38,62 q-2,30 -10,46" stroke="rgba(180,90,110,0.45)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M44,64 q-2,32 -2,50" stroke="rgba(180,90,110,0.45)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M50,64 q0,32 0,52" stroke="rgba(180,90,110,0.45)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M56,64 q2,32 2,50" stroke="rgba(180,90,110,0.45)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M62,62 q2,30 10,46" stroke="rgba(180,90,110,0.45)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <!-- pez abisal con luz (cerca de los 2000m) -->
+      <div class="bicho abisal" id="abisal">
+        <svg viewBox="0 0 140 80" xmlns="http://www.w3.org/2000/svg">
+          <!-- antena con bombilla -->
+          <path d="M70,30 q-6,-14 -18,-18" stroke="rgba(100,140,160,0.7)" stroke-width="1.2" fill="none"/>
+          <circle cx="52" cy="12" r="3.5" fill="#fff5b0"/>
+          <circle cx="52" cy="12" r="6" fill="rgba(255,240,140,0.25)"/>
+          <!-- cuerpo -->
+          <path d="M60,30 q20,-18 50,-2 q14,8 18,18 q-10,8 -22,4 q-6,12 -18,6 q-18,2 -28,-12 z"
+                fill="rgba(40,55,75,0.85)" stroke="rgba(100,140,160,0.5)" stroke-width="0.8"/>
+          <!-- ojo -->
+          <circle cx="78" cy="32" r="2.5" fill="#fff5b0"/>
+          <circle cx="78" cy="32" r="1.2" fill="#1a1a1a"/>
+          <!-- dientes -->
+          <path d="M88,42 l2,4 l2,-4 l2,4 l2,-4 l2,4 l2,-4 l2,4 l2,-4" stroke="rgba(240,240,240,0.7)" stroke-width="0.8" fill="none"/>
+        </svg>
+      </div>
+
+      <!-- transmisión de datos boya → satélite -->
+      <div class="transmision" id="transmision">
+        <div class="dato-paquete d1"></div>
+        <div class="dato-paquete d2"></div>
+        <div class="dato-paquete d3"></div>
+        <div class="dato-paquete d4"></div>
+      </div>
+
+      <!-- satélite (paso final) -->
+      <div class="satelite" id="satelite">
+        <svg viewBox="0 0 140 90" xmlns="http://www.w3.org/2000/svg">
+          <!-- panel solar izq -->
+          <rect x="6" y="32" width="34" height="20" fill="#3b5a8a" stroke="#7ad9ff" stroke-width="0.8"/>
+          <line x1="14" y1="32" x2="14" y2="52" stroke="#7ad9ff" stroke-width="0.4" opacity="0.6"/>
+          <line x1="23" y1="32" x2="23" y2="52" stroke="#7ad9ff" stroke-width="0.4" opacity="0.6"/>
+          <line x1="32" y1="32" x2="32" y2="52" stroke="#7ad9ff" stroke-width="0.4" opacity="0.6"/>
+          <!-- cuerpo -->
+          <rect x="48" y="30" width="44" height="24" rx="3" fill="#d8e2ec" stroke="#5a7090" stroke-width="0.8"/>
+          <circle cx="70" cy="42" r="4" fill="#7ad9ff" opacity="0.9"/>
+          <!-- panel solar der -->
+          <rect x="100" y="32" width="34" height="20" fill="#3b5a8a" stroke="#7ad9ff" stroke-width="0.8"/>
+          <line x1="108" y1="32" x2="108" y2="52" stroke="#7ad9ff" stroke-width="0.4" opacity="0.6"/>
+          <line x1="117" y1="32" x2="117" y2="52" stroke="#7ad9ff" stroke-width="0.4" opacity="0.6"/>
+          <line x1="126" y1="32" x2="126" y2="52" stroke="#7ad9ff" stroke-width="0.4" opacity="0.6"/>
+          <!-- antena -->
+          <line x1="70" y1="30" x2="70" y2="14" stroke="#5a7090" stroke-width="1"/>
+          <circle cx="70" cy="13" r="2" fill="#ffb670"/>
+          <!-- ondas de señal -->
+          <g class="ondas" stroke="#ffb670" stroke-width="0.8" fill="none" opacity="0.85">
+            <path d="M 60 22 Q 70 12 80 22"/>
+            <path d="M 55 26 Q 70 8 85 26"/>
+            <path d="M 50 30 Q 70 4 90 30"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- ballena -->
+      <div class="ballena" id="ballena">
+        <svg viewBox="0 0 120 50" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10,25 Q30,10 70,22 Q90,28 110,20 Q100,35 80,32 Q60,40 30,35 Q15,38 5,32 Z" fill="rgba(100,160,200,0.18)"/>
+          <path d="M5,32 Q0,28 5,24" fill="rgba(100,160,200,0.18)"/>
+        </svg>
+      </div>
+
+      <!-- textos por etapa -->
+      <div class="etapa" id="e0">
+        <p class="etapa-num">01</p>
+        <h2>la tiramos al mar</h2>
+        <p>desde un barco de investigación,<br>la boya cae al océano.</p>
+      </div>
+
+      <div class="etapa" id="e1">
+        <p class="etapa-num">02</p>
+        <h2>baja sola</h2>
+        <p>sin motor. bombea aceite<br>para cambiar su flotabilidad.</p>
+      </div>
+
+      <div class="etapa" id="e2">
+        <p class="etapa-num">03</p>
+        <h2>deriva 10 días</h2>
+        <p>a 1000 metros de profundidad,<br>el océano la lleva adonde quiere.</p>
+      </div>
+
+      <div class="etapa" id="e3">
+        <p class="etapa-num">04</p>
+        <h2>baja hasta 2000 m</h2>
+        <p>y arranca el perfil.<br>acá empieza lo importante.</p>
+      </div>
+
+      <div class="etapa" id="e4">
+        <p class="etapa-num">05</p>
+        <h2>mide mientras sube</h2>
+        <p>temperatura, salinidad y presión.<br>todo el camino hasta la superficie.</p>
+      </div>
+
+      <div class="etapa" id="e5">
+        <p class="etapa-num">06</p>
+        <h2>manda los datos</h2>
+        <p>por satélite, en minutos,<br>a científicos de todo el mundo.</p>
+        <p class="dato">hay casi 4000 boyas activas ahora mismo.</p>
+      </div>
+
+      <div class="etapa" id="e6">
+        <p class="etapa-num">↻</p>
+        <h2>y vuelve a empezar</h2>
+        <p>cada 10 días, durante años,<br>la misma boya repite el ciclo.</p>
+        <p class="dato">una boya puede vivir más de 5 años en el océano.</p>
+      </div>
+
+      <div class="profundimetro">
+        <div class="numero" id="depth-num">0</div>
+        <div class="unidad">metros</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Placa de cierre -->
+  <section class="outro">
+
+    <!-- flota de boyas de fondo -->
+    <div class="flota" aria-hidden="true">
+      <svg class="mini-boya b1" viewBox="0 0 40 80"><line x1="20" y1="2" x2="20" y2="14" stroke="#7ad9ff" stroke-width="1.5"/><circle cx="20" cy="2" r="1.5" fill="#7ad9ff"/><rect x="10" y="14" width="20" height="46" rx="10" fill="#D4EAF5"/><rect x="10" y="32" width="20" height="6" rx="2" fill="#A0C8E0"/></svg>
+      <svg class="mini-boya b2" viewBox="0 0 40 80"><line x1="20" y1="2" x2="20" y2="14" stroke="#7ad9ff" stroke-width="1.5"/><circle cx="20" cy="2" r="1.5" fill="#7ad9ff"/><rect x="10" y="14" width="20" height="46" rx="10" fill="#D4EAF5"/><rect x="10" y="32" width="20" height="6" rx="2" fill="#A0C8E0"/></svg>
+      <svg class="mini-boya b3" viewBox="0 0 40 80"><line x1="20" y1="2" x2="20" y2="14" stroke="#7ad9ff" stroke-width="1.5"/><circle cx="20" cy="2" r="1.5" fill="#7ad9ff"/><rect x="10" y="14" width="20" height="46" rx="10" fill="#D4EAF5"/><rect x="10" y="32" width="20" height="6" rx="2" fill="#A0C8E0"/></svg>
+      <svg class="mini-boya b4" viewBox="0 0 40 80"><line x1="20" y1="2" x2="20" y2="14" stroke="#7ad9ff" stroke-width="1.5"/><circle cx="20" cy="2" r="1.5" fill="#7ad9ff"/><rect x="10" y="14" width="20" height="46" rx="10" fill="#D4EAF5"/><rect x="10" y="32" width="20" height="6" rx="2" fill="#A0C8E0"/></svg>
+      <svg class="mini-boya b5" viewBox="0 0 40 80"><line x1="20" y1="2" x2="20" y2="14" stroke="#7ad9ff" stroke-width="1.5"/><circle cx="20" cy="2" r="1.5" fill="#7ad9ff"/><rect x="10" y="14" width="20" height="46" rx="10" fill="#D4EAF5"/><rect x="10" y="32" width="20" height="6" rx="2" fill="#A0C8E0"/></svg>
+      <svg class="mini-boya b6" viewBox="0 0 40 80"><line x1="20" y1="2" x2="20" y2="14" stroke="#7ad9ff" stroke-width="1.5"/><circle cx="20" cy="2" r="1.5" fill="#7ad9ff"/><rect x="10" y="14" width="20" height="46" rx="10" fill="#D4EAF5"/><rect x="10" y="32" width="20" height="6" rx="2" fill="#A0C8E0"/></svg>
+      <!-- burbujitas -->
+      <span class="burbuja bu1"></span>
+      <span class="burbuja bu2"></span>
+      <span class="burbuja bu3"></span>
+      <span class="burbuja bu4"></span>
+      <span class="burbuja bu5"></span>
+      <span class="burbuja bu6"></span>
+    </div>
+
+    <div class="outro-content">
+      <p class="outro-marca">programa argo · since 1999</p>
+      <h2 class="outro-main">una flota global, siempre activa.</h2>
+      <p class="outro-data">
+        ~4000 boyas activas<br>
+        ~150.000 perfiles por año<br>
+        cubriendo todos los océanos del planeta
+      </p>
+      <p class="outro-cita">los datos son abiertos, gratuitos<br>y los usan miles de científicos en el mundo.</p>
+
+      <div class="outro-firma">
+        <h3>hecho por daniu</h3>
+        <div class="outro-icons">
+          <a href="https://github.com/dbrisaro" target="_blank" title="GitHub">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577v-2.165c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          </a>
+          <a href="https://twitter.com/dbrisaro" target="_blank" title="Twitter / X">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/dani.risaro/" target="_blank" title="Instagram">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          </a>
+          <a href="https://www.linkedin.com/in/daniela-risaro-539420145/" target="_blank" title="LinkedIn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
