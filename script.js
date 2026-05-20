@@ -63,9 +63,9 @@ const waterLineKf = [
   { t: 0.00, v: 0.50 },
   { t: 0.22, v: 0.50 },
   { t: 0.38, v: 0.00 },  // cámara se sumerge
-  { t: 0.78, v: 0.00 },  // perfil entero visible
-  { t: 0.84, v: 0.50 },  // cámara hace pull back, superficie al medio
-  { t: 1.00, v: 0.50 },  // se mantiene al medio durante transmisión y cierre
+  { t: 0.82, v: 0.00 },  // perfil completo + boya en superficie con vista de full agua
+  { t: 0.86, v: 0.50 },  // pull back rápido al medio
+  { t: 1.00, v: 0.50 },  // se mantiene al medio mucho rato para la transmisión
 ]
 
 // profundidad (m) → y de viewport, dado el waterLine actual
@@ -108,8 +108,8 @@ const etapaKf = [
   { t: 0.42, e: 2 },
   { t: 0.52, e: 3 },
   { t: 0.64, e: 4 },
-  { t: 0.84, e: 5 },   // manda los datos — escena estable con cielo al medio
-  { t: 0.95, e: 6 },   // vuelve a empezar
+  { t: 0.86, e: 5 },   // manda los datos arranca cuando el pull back terminó
+  { t: 0.96, e: 6 },   // vuelve a empezar al final
 ]
 
 function currentEtapa(t) {
@@ -222,9 +222,9 @@ function update() {
   document.getElementById('abisal').classList.toggle('visible',
     depth > 1700)
 
-  // satélite y transmisión aparecen cuando la cámara hace pull back
-  satelite.classList.toggle('visible', p > 0.82)
-  transmision.classList.toggle('visible', p > 0.85)
+  // satélite y transmisión aparecen una vez que la superficie llegó al medio
+  satelite.classList.toggle('visible', p > 0.85)
+  transmision.classList.toggle('visible', p > 0.87)
 
   // glow al subir midiendo
   const subiendo = p > 0.62 && p < 0.78
