@@ -81,7 +81,7 @@ body {
 /* ── Scroll driver ── */
 
 .scroll-driver {
-  height: 700vh;
+  height: 950vh;
   position: relative;
 }
 
@@ -532,6 +532,15 @@ body {
   margin: 0 0 32px;
 }
 
+.outro-resumen {
+  font-family: 'Handlee', cursive;
+  font-size: clamp(14px, 1.8vw, 16px);
+  line-height: 1.6;
+  color: rgba(122, 217, 255, 0.75);
+  letter-spacing: 0.5px;
+  margin: 0 0 36px;
+}
+
 .outro-cita {
   font-family: 'Fraunces', serif;
   font-weight: 300;
@@ -633,19 +642,6 @@ body {
   transform: translateY(-3px);
 }
 
-#e6 .etapa-num {
-  font-size: 28px;
-  color: rgba(122,217,255,0.7);
-  letter-spacing: 0;
-  margin-bottom: 4px;
-  animation: girar 8s linear infinite;
-  display: inline-block;
-  transform-origin: center;
-}
-@keyframes girar {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
 
 /* ── Transmisión de datos ── */
 /* anclado exactamente en la punta de la antena de la boya */
@@ -664,13 +660,16 @@ body {
 
 .dato-paquete {
   position: absolute;
-  left: -3px;
-  top: -3px;
-  width: 6px;
-  height: 6px;
+  left: -4px;
+  top: -4px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: #ffd86a;
-  box-shadow: 0 0 8px rgba(255,216,106,0.95), 0 0 16px rgba(255,182,112,0.6);
+  background: #ffffff;
+  box-shadow:
+    0 0 6px rgba(255,255,255,1),
+    0 0 14px rgba(0,229,255,0.9),
+    0 0 24px rgba(0,150,220,0.6);
   animation: transmitir 2.4s ease-in infinite;
   opacity: 0;
 }
@@ -682,9 +681,9 @@ body {
 /* viaja desde (0,0) — la antena de la boya — hasta el satélite arriba lejos */
 @keyframes transmitir {
   0%   { transform: translate(0, 0) scale(0.5);   opacity: 0; }
-  10%  { transform: translate(2vw, -3vh) scale(0.9); opacity: 1; }
+  10%  { transform: translate(2vw, -4vh) scale(0.9); opacity: 1; }
   90%  { opacity: 0.85; }
-  100% { transform: translate(22vw, -40vh) scale(0.7); opacity: 0; }
+  100% { transform: translate(22vw, -52vh) scale(0.7); opacity: 0; }
 }
 
 /* ── Satélite ── */

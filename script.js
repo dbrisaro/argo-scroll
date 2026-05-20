@@ -64,8 +64,8 @@ const waterLineKf = [
   { t: 0.22, v: 0.50 },
   { t: 0.38, v: 0.00 },  // cámara se sumerge
   { t: 0.82, v: 0.00 },  // perfil completo + boya en superficie con vista de full agua
-  { t: 0.86, v: 0.50 },  // pull back rápido al medio
-  { t: 1.00, v: 0.50 },  // se mantiene al medio mucho rato para la transmisión
+  { t: 0.86, v: 0.65 },  // pull back: superficie queda más abajo, mucho cielo arriba
+  { t: 1.00, v: 0.65 },
 ]
 
 // profundidad (m) → y de viewport, dado el waterLine actual
@@ -80,7 +80,7 @@ function depthToY(depth, waterLineY) {
 const boyaX = [
   { t: 0.00, v: 90 },  // a un costado del buque
   { t: 0.32, v: 30 },
-  { t: 0.40, v: 0 },
+  { t: 0.40, v: -100 },
   { t: 0.50, v: 90 },  // deriva durante la fase de los 1000m
   { t: 0.58, v: 30 },
   { t: 0.78, v: 0 },   // centrada al volver a la superficie
@@ -108,8 +108,9 @@ const etapaKf = [
   { t: 0.42, e: 2 },
   { t: 0.52, e: 3 },
   { t: 0.64, e: 4 },
-  { t: 0.86, e: 5 },   // manda los datos arranca cuando el pull back terminó
-  { t: 0.96, e: 6 },   // vuelve a empezar al final
+  { t: 0.78, e: -1 },  // se esfuma cuando la boya llega a la superficie
+  { t: 0.84, e: 5 },   // 06 manda los datos
+  { t: 0.88, e: 6 },   // 07 vuelve a empezar (mismo escenario, sólo cambia el texto)
 ]
 
 function currentEtapa(t) {
@@ -138,6 +139,11 @@ function update() {
   const x = sampleKeyframes(boyaX, p)
   boya.style.top = (y * 100) + 'vh'
   boya.style.transform = `translateX(calc(-50% + ${x}px))`
+
+  // la boya aparece después del barco (el barco la tira al agua)
+  const boyaOp = p < 0.18 ? 0 : Math.min(1, (p - 0.18) / 0.05)
+  boya.style.opacity = boyaOp
+  boya.style.visibility = boyaOp < 0.02 ? 'hidden' : 'visible'
 
   // actualizo línea de agua, cielo y perfil según waterLineY
   const wlPct = waterLineY * 100
@@ -171,8 +177,8 @@ function update() {
 
   // barco: aparece recién cuando entramos al paso 01 (el ocean ya está sticky)
   let barcoOp
-  if (p < 0.14)      barcoOp = 0                                      // aún en transición desde el intro
-  else if (p < 0.20) barcoOp = (p - 0.14) / 0.06                      // fade-in
+  if (p < 0.1)      barcoOp = 0                                      // aún en transición desde el intro
+  else if (p < 0.20) barcoOp = (p - 0.1) / 0.06                      // fade-in
   else if (p < 0.30) barcoOp = 1                                      // pleno paso 01
   else               barcoOp = Math.max(0, 1 - (p - 0.30) / 0.12)     // se aleja navegando
   const barcoDrift = Math.max(0, (p - 0.22)) / 0.20 * 380
@@ -190,15 +196,15 @@ function update() {
   // otros bichos según profundidad (depth)
   // posicionar bichos dinámicamente según su profundidad objetivo
   const bichos = {
-    peces:    30,
-    tortuga:  20,
+    peces:    600,
+    tortuga:  150,
     delfines: 25,
     medusa:   500,
     krill:    900,
     calamar:  1400,
     abisal:   1900,
     estrella: 1980,
-    ballena:  900,
+    ballena:  1200,
   }
   for (const [id, prof] of Object.entries(bichos)) {
     const el = document.getElementById(id)
@@ -222,16 +228,18 @@ function update() {
   document.getElementById('abisal').classList.toggle('visible',
     depth > 1700)
 
-  // satélite y transmisión aparecen una vez que la superficie llegó al medio
+  // satélite y transmisión aparecen una vez que la superficie llegó a su altura final
   satelite.classList.toggle('visible', p > 0.85)
   transmision.classList.toggle('visible', p > 0.87)
+  // ancla la transmisión a la antena de la boya en su nueva altura
+  transmision.style.top = ((waterLineY - 0.025) * 100) + '%'
 
   // glow al subir midiendo
   const subiendo = p > 0.62 && p < 0.78
   boya.classList.toggle('midiendo', subiendo)
 
   // perfil que se dibuja mientras sube y queda dibujado durante la transmisión
-  perfil.classList.toggle('activo', p > 0.60 && p < 0.95)
+  perfil.classList.toggle('activo', p > 0.60 && p < 0.8)
   const subProg = Math.max(0, Math.min(1, (p - 0.62) / (0.78 - 0.62)))
   perfilPath.style.strokeDashoffset = perfilLen * (1 - subProg)
   perfilSal.style.strokeDashoffset  = perfilSalLen * (1 - subProg)
