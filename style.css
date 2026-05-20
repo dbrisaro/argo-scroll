@@ -250,8 +250,10 @@ body {
 /* ── Perfil dibujado al subir ── */
 .perfil {
   position: absolute;
-  inset: 0;
-  width: 100%;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(380px, 65vw, 720px);
   height: 100%;
   pointer-events: none;
   opacity: 0;
