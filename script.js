@@ -165,8 +165,8 @@ function update() {
   const subiendo = p > 0.64 && p < 0.84
   boya.classList.toggle('midiendo', subiendo)
 
-  // perfil que se dibuja mientras sube (2000m → superficie), se va al transmitir
-  perfil.classList.toggle('activo', p > 0.62 && p < 0.85)
+  // perfil que se dibuja mientras sube y queda dibujado durante la transmisión
+  perfil.classList.toggle('activo', p > 0.62 && p < 0.97)
   const subProg = Math.max(0, Math.min(1, (p - 0.64) / (0.84 - 0.64)))
   perfilPath.style.strokeDashoffset = perfilLen * (1 - subProg)
   perfilSal.style.strokeDashoffset  = perfilSalLen * (1 - subProg)
