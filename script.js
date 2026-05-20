@@ -53,20 +53,19 @@ const depthKf = [
   { t: 0.28, v: 0 },
   { t: 0.40, v: 1000 },
   { t: 0.50, v: 1100 },
-  { t: 0.64, v: 2000 },
-  { t: 0.84, v: 0 },
+  { t: 0.62, v: 2000 },
+  { t: 0.78, v: 0 },     // llega a la superficie antes
   { t: 1.00, v: 0 },
 ]
 
 // posición vertical de la línea de agua en el viewport (0 = arriba, 0.5 = mitad)
-// arranca al medio (sky + water), se va al tope cuando se sumerge, vuelve al medio al transmitir
 const waterLineKf = [
   { t: 0.00, v: 0.50 },
   { t: 0.22, v: 0.50 },
-  { t: 0.38, v: 0.00 },  // cámara se sumerge: agua ocupa todo el alto
-  { t: 0.84, v: 0.00 },  // ascenso completo: aún full agua para ver perfil entero
-  { t: 0.92, v: 0.50 },  // transmitiendo: superficie vuelve al medio
-  { t: 1.00, v: 0.50 },
+  { t: 0.38, v: 0.00 },  // cámara se sumerge
+  { t: 0.78, v: 0.00 },  // perfil entero visible
+  { t: 0.84, v: 0.50 },  // cámara hace pull back, superficie al medio
+  { t: 1.00, v: 0.50 },  // se mantiene al medio durante transmisión y cierre
 ]
 
 // profundidad (m) → y de viewport, dado el waterLine actual
@@ -79,26 +78,26 @@ function depthToY(depth, waterLineY) {
 
 // deriva horizontal: durante la fase de drift se mueve de costado
 const boyaX = [
-  { t: 0.00, v: 70 },  // a un costado del barquito, no encima
+  { t: 0.00, v: 90 },  // a un costado del buque
   { t: 0.32, v: 30 },
   { t: 0.40, v: 0 },
-  { t: 0.50, v: 90 },
-  { t: 0.60, v: 30 },
-  { t: 0.84, v: 0 },
+  { t: 0.50, v: 90 },  // deriva durante la fase de los 1000m
+  { t: 0.58, v: 30 },
+  { t: 0.78, v: 0 },   // centrada al volver a la superficie
   { t: 1.00, v: 0 },
 ]
 
 // Color de fondo — de superficie iluminada a profundidad oscura
 const bgColor = [
   { t: 0.00, v: [170, 215, 232] },
-  { t: 0.28, v: [120, 195, 220] }, // sigue clara durante paso 01
+  { t: 0.28, v: [120, 195, 220] },
   { t: 0.36, v: [40,  140, 180] },
   { t: 0.44, v: [10,  70,  110] },
-  { t: 0.54, v: [4,   36,  68]  },
-  { t: 0.60, v: [3,   14,  36]  }, // 1000m
-  { t: 0.66, v: [2,   8,   22]  }, // 2000m
-  { t: 0.80, v: [30,  120, 165] },
-  { t: 0.90, v: [170, 215, 232] },
+  { t: 0.52, v: [4,   36,  68]  },
+  { t: 0.58, v: [3,   14,  36]  }, // 1000m
+  { t: 0.62, v: [2,   8,   22]  }, // 2000m
+  { t: 0.72, v: [30,  120, 165] },
+  { t: 0.82, v: [170, 215, 232] }, // ya en superficie
   { t: 1.00, v: [170, 215, 232] },
 ]
 
@@ -108,9 +107,9 @@ const etapaKf = [
   { t: 0.28, e: 1 },
   { t: 0.42, e: 2 },
   { t: 0.52, e: 3 },
-  { t: 0.66, e: 4 },
-  { t: 0.85, e: 5 },
-  { t: 0.94, e: 6 },
+  { t: 0.64, e: 4 },
+  { t: 0.84, e: 5 },   // manda los datos — escena estable con cielo al medio
+  { t: 0.95, e: 6 },   // vuelve a empezar
 ]
 
 function currentEtapa(t) {
@@ -159,15 +158,16 @@ function update() {
   luz.style.opacity = luzOpacity
   superficie.style.opacity = luzOpacity
 
-  // modo superficie (texto oscuro + cielo visible)
-  const enSuperficie = p < 0.22 || p > 0.88
+  // modo superficie (texto oscuro + cielo visible) cuando el cielo está visible
+  const enSuperficie = waterLineY > 0.05
   ocean.classList.toggle('superficie-modo', enSuperficie)
   cielo.classList.toggle('visible', enSuperficie)
 
-  // barco: queda en la superficie durante paso 01, después se aleja navegando
+  // barco: aparece sólo en el paso 01 y se aleja, nunca vuelve
   const barcoOp = p < 0.28 ? 1 : Math.max(0, 1 - (p - 0.28) / 0.14)
   const barcoDrift = Math.max(0, (p - 0.20)) / 0.22 * 380
   barco.style.opacity = barcoOp
+  barco.style.visibility = barcoOp < 0.02 ? 'hidden' : 'visible'
   barco.style.transform = `translateX(calc(-50% + ${Math.min(barcoDrift, 380)}px))`
 
   // profundidad ya está en metros
@@ -212,17 +212,17 @@ function update() {
   document.getElementById('abisal').classList.toggle('visible',
     depth > 1700)
 
-  // satélite y transmisión aparecen en el paso final
-  satelite.classList.toggle('visible', p > 0.85)
-  transmision.classList.toggle('visible', p > 0.87)
+  // satélite y transmisión aparecen cuando la cámara hace pull back
+  satelite.classList.toggle('visible', p > 0.82)
+  transmision.classList.toggle('visible', p > 0.85)
 
   // glow al subir midiendo
-  const subiendo = p > 0.64 && p < 0.84
+  const subiendo = p > 0.62 && p < 0.78
   boya.classList.toggle('midiendo', subiendo)
 
   // perfil que se dibuja mientras sube y queda dibujado durante la transmisión
-  perfil.classList.toggle('activo', p > 0.62 && p < 0.97)
-  const subProg = Math.max(0, Math.min(1, (p - 0.64) / (0.84 - 0.64)))
+  perfil.classList.toggle('activo', p > 0.60 && p < 0.95)
+  const subProg = Math.max(0, Math.min(1, (p - 0.62) / (0.78 - 0.62)))
   perfilPath.style.strokeDashoffset = perfilLen * (1 - subProg)
   perfilSal.style.strokeDashoffset  = perfilSalLen * (1 - subProg)
 
