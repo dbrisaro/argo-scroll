@@ -169,9 +169,13 @@ function update() {
   ocean.classList.toggle('superficie-modo', enSuperficie)
   cielo.classList.toggle('visible', enSuperficie)
 
-  // barco: aparece sólo en el paso 01 y se aleja, nunca vuelve
-  const barcoOp = p < 0.28 ? 1 : Math.max(0, 1 - (p - 0.28) / 0.14)
-  const barcoDrift = Math.max(0, (p - 0.20)) / 0.22 * 380
+  // barco: aparece recién cuando entramos al paso 01 (el ocean ya está sticky)
+  let barcoOp
+  if (p < 0.14)      barcoOp = 0                                      // aún en transición desde el intro
+  else if (p < 0.20) barcoOp = (p - 0.14) / 0.06                      // fade-in
+  else if (p < 0.30) barcoOp = 1                                      // pleno paso 01
+  else               barcoOp = Math.max(0, 1 - (p - 0.30) / 0.12)     // se aleja navegando
+  const barcoDrift = Math.max(0, (p - 0.22)) / 0.20 * 380
   barco.style.opacity = barcoOp
   barco.style.visibility = barcoOp < 0.02 ? 'hidden' : 'visible'
   barco.style.transform = `translateX(calc(-50% + ${Math.min(barcoDrift, 380)}px))`

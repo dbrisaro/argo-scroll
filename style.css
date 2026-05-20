@@ -355,11 +355,12 @@ body {
 .etapa {
   position: absolute;
   left: 8%;
-  max-width: 260px;
+  max-width: 280px;
   opacity: 0;
   transform: translateY(8px);
   transition: opacity 0.5s ease, transform 0.5s ease;
   pointer-events: none;
+  z-index: 8;
 }
 
 .etapa.visible {
